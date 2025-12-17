@@ -35,12 +35,23 @@ public class Runigram {
 		in.readInt();
 		// Creates the image array
 		Color[][] image = new Color[numRows][numCols];
+ 
+         for ( int i = 0 ; i < image.length; i++)
+		 {
+			for (int j= 0; j < image[i].length; j ++)
+			{
+                int r = in.readInt();
+				int g = in.readInt();
+				int b = in.readInt();
+				image[i][j] = new Color (r,g,b);
+			}
+		 }
 		// Reads the RGB values from the file into the image array. 
 		// For each pixel (i,j), reads 3 values from the file,
 		// creates from the 3 colors a new Color object, and 
 		// makes pixel (i,j) refer to that object.
 		//// Replace the following statement with your code.
-		return null;
+		return image;
 	}
 
     // Prints the RGB values of a given color.
@@ -60,38 +71,75 @@ public class Runigram {
 	private static void print(Color[][] image) {
 		//// Replace this comment with your code
 		//// Notice that all you have to so is print every element (i,j) of the array using the print(Color) function.
+		for (int i = 0; i < image.length; i++)
+			 { for (int j = 0; j < image[i].length; j ++ )
+		     {
+				print (image [i][j]);
+			 }
+			 System.out.println(); }
 	}
 	
 	/**
 	 * Returns an image which is the horizontally flipped version of the given image. 
 	 */
 	public static Color[][] flippedHorizontally(Color[][] image) {
-		//// Replace the following statement with your code
-		return null;
+		Color [][] flipped  = new Color [image.length][image[0].length];
+		for ( int i = 0; i < image.length; i++)
+		{ int z = 0;
+		 for (int j = image[i].length - 1; j>=0; j--)
+			{
+              flipped [i][z] = image[i][j]; 
+               z++;
+			}	
+		}
+		return flipped;
 	}
 	
 	/**
 	 * Returns an image which is the vertically flipped version of the given image. 
 	 */
 	public static Color[][] flippedVertically(Color[][] image){
-		//// Replace the following statement with your code
-		return null;
+		Color [][] flippedV  = new Color [image.length][image[0].length];
+		int z = 0;
+		for (int i = image.length -1; i >=0 ; i--)
+		{   
+			for (int j = 0 ; j < image[i].length; j++ )
+			{
+				flippedV[z][j]=image[i][j];
+				
+			}
+			z++;
+		}
+		
+		return flippedV;
 	}
 	
 	// Computes the luminance of the RGB values of the given pixel, using the formula 
 	// lum = 0.299 * r + 0.587 * g + 0.114 * b, and returns a Color object consisting
 	// the three values r = lum, g = lum, b = lum.
 	private static Color luminance(Color pixel) {
-		//// Replace the following statement with your code
-		return null;
+		int r = pixel.getRed();
+		int g = pixel.getGreen();
+		int b = pixel.getBlue();
+		int lum = (int)( 0.299 * r + 0.587 * g + 0.114 * b);
+		Color lumc = new Color(lum,lum,lum);
+		return lumc;
 	}
 	
 	/**
 	 * Returns an image which is the grayscaled version of the given image.
 	 */
 	public static Color[][] grayScaled(Color[][] image) {
-		//// Replace the following statement with your code
-		return null;
+		Color [][] gImage = new Color[image.length][image[0].length];
+		for (int i = 0; i < image.length; i ++)
+		{
+			for (int j = 0; j < image[i].length; j++)
+			{
+                 gImage[i][j] = luminance(image[i][j]);
+			}
+		}
+
+		return gImage;
 	}	
 	
 	/**
@@ -99,8 +147,19 @@ public class Runigram {
 	 * The image is scaled (resized) to have the given width and height.
 	 */
 	public static Color[][] scaled(Color[][] image, int width, int height) {
-		//// Replace the following statement with your code
-		return null;
+		Color [][] sImage = new Color[height][width];
+        int oldH = image.length;
+        int oldW = image[0].length;
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0 ; j < width; j++)
+			{
+				int srcRow = (int)(i*(oldH / (double) height));
+				int srcCol = (int)(j*(oldW / (double) width));
+				sImage[i][j] = image [srcRow][srcCol];
+			}
+		}
+		return sImage;
 	}
 	
 	/**
@@ -110,8 +169,10 @@ public class Runigram {
 	 * values in the two input color.
 	 */
 	public static Color blend(Color c1, Color c2, double alpha) {
-		//// Replace the following statement with your code
-		return null;
+		int r = (int)(alpha * c1.getRed() + (1-alpha)*c2.getRed());
+		int g = (int) (alpha * c1.getGreen() + (1-alpha)*c2.getGreen());
+		int b = (int) (alpha * c1.getBlue() + (1-alpha)*c2.getBlue());
+		return new Color(r,g,b);
 	}
 	
 	/**
@@ -121,8 +182,16 @@ public class Runigram {
 	 * The two images must have the same dimensions.
 	 */
 	public static Color[][] blend(Color[][] image1, Color[][] image2, double alpha) {
-		//// Replace the following statement with your code
-		return null;
+		 Color[][] Blended = new Color[ image1.length ][ image1[0].length ];
+
+    for ( int i = 0; i < Blended.length; i++)
+	{
+		for ( int j = 0; j < Blended[i].length; j ++)
+		{
+			Blended [i][j] = blend(image1[i][j], image2[i][j], alpha);
+		}
+	}
+    return Blended;
 	}
 
 	/**
@@ -132,7 +201,21 @@ public class Runigram {
 	 * of the source image.
 	 */
 	public static void morph(Color[][] source, Color[][] target, int n) {
-		//// Replace this comment with your code
+		//make target same size as source
+    Color[][] t = target;
+    if ( t.length!=source.length || t[0].length!=source[0].length ) {
+        t = scaled(t, source[0].length, source.length);
+    }
+
+    // animate steps + what each step does for me 
+    for (int i = 0; i <= n; i++) {
+
+        double alpha =  (n - i) / (double) n; // compute alpha for this step
+        Color[][] frame = blend(source, t, alpha); // compute the morphed image
+        display(frame); // display the morphed image
+
+        StdDraw.pause(500);//pausing for 500 milliseconds
+    }
 	}
 	
 	/** Creates a canvas for the given image. */
